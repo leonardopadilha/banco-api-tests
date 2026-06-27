@@ -1,0 +1,230 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Transferências Bancárias",
+    "description": "Esta API permite realizar operações bancárias, como login e transferências entre contas, com autenticação baseada em JWT. A API verifica as condições para realizar transferências de acordo com regras de negócio, como saldo suficiente e contas ativas.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Equipe de Desenvolvimento",
+      "email": "suporte@banco.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor local de desenvolvimento"
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "summary": "Login de usuário e geração de token JWT",
+        "description": "Este endpoint permite que o usuário se autentique com um nome de usuário e senha, retornando um token JWT para uso em requisições subsequentes.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "description": "Nome de usuário para login"
+                  },
+                  "senha": {
+                    "type": "string",
+                    "description": "Senha do usuário"
+                  }
+                },
+                "required": ["username", "senha"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token gerado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Token JWT gerado"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parâmetros de login ausentes"
+          },
+          "401": {
+            "description": "Credenciais inválidas"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    },
+    "/transferencia": {
+      "post": {
+        "summary": "Realiza uma transferência entre contas",
+        "description": "Este endpoint realiza a transferência entre duas contas, verificando saldo suficiente, se as contas estão ativas e se o valor da transferência é válido. Para transferências acima de R$ 5000,00, uma autenticação extra é exigida.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contaOrigem": {
+                    "type": "integer",
+                    "description": "ID da conta de origem"
+                  },
+                  "contaDestino": {
+                    "type": "integer",
+                    "description": "ID da conta de destino"
+                  },
+                  "valor": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "Valor da transferência"
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "Token de autenticação necessário para transferências acima de R$ 5000,00"
+                  }
+                },
+                "required": ["contaOrigem", "contaDestino", "valor"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Transferência realizada com sucesso"
+          },
+          "400": {
+            "description": "Parâmetros de transferência inválidos"
+          },
+          "401": {
+            "description": "Autenticação necessária ou inválida"
+          },
+          "422": {
+            "description": "Erro de validação de dados (saldo insuficiente, contas inativas, etc.)"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      },
+      "get": {
+        "summary": "Lista as transferências realizadas",
+        "description": "Este endpoint retorna as transferências realizadas, com suporte a paginação. A autenticação via JWT é necessária.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Página de resultados",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Número de resultados por página",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de transferências",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "page": {
+                      "type": "integer"
+                    },
+                    "limit": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "transferencias": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "conta_origem_id": {
+                            "type": "integer"
+                          },
+                          "conta_destino_id": {
+                            "type": "integer"
+                          },
+                          "valor": {
+                            "type": "number",
+                            "format": "float"
+                          },
+                          "data_hora": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro ao buscar transferências"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
