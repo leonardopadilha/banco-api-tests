@@ -7,10 +7,9 @@ async function login(username, senha) {
     const response = await request(API_URL)
             .post('/login')
             .set('Content-Type', 'application/json')
-            .send({ username, senha });
+            .send({ 'username': username, 'senha': senha });
 
-    expect(response.status).to.be.equal(200);
-    return response.body
+    return response
 }
 
 module.exports = { login }

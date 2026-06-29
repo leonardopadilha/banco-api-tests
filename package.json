@@ -14,7 +14,6 @@
   "dependencies": {
     "apollo-server": "^3.13.0",
     "crypto": "^1.0.1",
-    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "graphql": "^16.10.0",
     "http-errors": "^2.0.0",
@@ -25,6 +24,7 @@
   },
   "devDependencies": {
     "chai": "^6.2.2",
+    "dotenv": "^17.4.2",
     "mocha": "^11.7.6",
     "mochawesome": "^7.1.4",
     "supertest": "^7.2.2"
