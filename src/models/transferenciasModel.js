@@ -22,7 +22,9 @@ async function getTotalTransferencias() {
 
 async function getTransferenciaById(id) {
     const [transferencia] = await db.query('SELECT * FROM transferencias WHERE id = ?', [id]);
-    return transferencia[0]; 
+    const t = transferencia[0]
+    if (t) t.valor = parseFloat(t.valor);
+    return t;
 }
 
 async function atualizarTransferencia(id, contaOrigem, contaDestino, valor, autenticada) {

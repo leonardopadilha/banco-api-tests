@@ -1,0 +1,22 @@
+{
+    "conta_ativa": {
+        "origem": 1,
+        "destino": 2   
+    },
+    "conta_origem_inexistente": {
+        "origem": 9999,
+        "destino": 2
+    },
+    "conta_destino_inexistente": {
+        "origem": 1,
+        "destino": 9999
+    },
+    "conta_origem_inativa": {
+        "origem": 3,
+        "destino": 2
+    },
+    "conta_destino_inativa": {
+        "origem": 1,
+        "destino": 3
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "usuario_valido": {
+        "username": "leonardo.padilha",
+        "senha": "123456"
+    },
+    "usuario_senha_incorreta": {
+        "username": "leonardo.padilha",
+        "senha": "senhaErrada"
+    },
+    "usuario_inexistente": {
+        "username": "usuario.inexistente",
+        "senha": "123456"
+    },
+    "usuario_invalido": {
+        "username": "usuario.inexistente",
+        "senha": "senhaErrada"
+    },
+    "senha_vazia": {
+        "username": "leonardo.padilha"
+    },
+    "username_vazio": {
+        "senha": "123456"
+    }
+}

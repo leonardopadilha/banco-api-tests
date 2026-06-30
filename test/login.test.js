@@ -4,6 +4,7 @@ const request = require('supertest');
 const { expect } = require('chai');
 const jwt = require('jsonwebtoken');
 const { login } = require('../helpers/login.js');
+const usuarios = require('../fixtures/usuarios.json');
 
 const API_URL = process.env.API_URL;
 //const JWT_SECRET = process.env.JWT_SECRET || 'secret_key';
@@ -11,7 +12,9 @@ const API_URL = process.env.API_URL;
 describe('Login', () => {
     describe('POST /login', () => {
         it('Deve retornar 200 com um token em string quando usar credenciais válidas', async () => {
-            const response = await login('leonardo.padilha', '123456');
+            const { username, senha } = usuarios.usuario_valido;
+
+            const response = await login(username, senha);
 
             expect(response.status).to.be.equal(200);
             expect(response.body.token).to.be.a('string');
@@ -20,35 +23,41 @@ describe('Login', () => {
         });
 
         it('Deve retornar 401 quando a senha for incorreta', async () => {
-            const response = await login('leonardo.padilha', 'senhaErrada');
+            const { username, senha } = usuarios.usuario_senha_incorreta;
+
+            const response = await login(username, senha);
 
             expect(response.status).to.be.equal(401);
             expect(response.body.error).to.be.equal('Usuário ou senha inválidos.');
         });
 
         it('Deve retornar 401 quando o usuário não existir', async () => {
-            const response = await login('usuario.inexistente', '123456');
+            const { username, senha } = usuarios.usuario_inexistente    ;
+            const response = await login(username, senha);
 
             expect(response.status).to.be.equal(401);
             expect(response.body.error).to.be.equal('Usuário ou senha inválidos.');
         });
 
         it('Deve retornar 401 quando usuário e senha forem incorretos', async () => {
-            const response = await login('usuario.inexistente', 'senhaErrada');
+            const { username, senha } = usuarios.usuario_invalido;
+            const response = await login(username, senha);
 
             expect(response.status).to.be.equal(401);
             expect(response.body.error).to.be.equal('Usuário ou senha inválidos.');
         });
 
         it('Deve retornar 400 quando o username não for informado', async () => {
-            const response = await login('123456');
+            const { senha } = usuarios.username_vazio;
+            const response = await login(senha);
 
             expect(response.status).to.be.equal(400);
             expect(response.body.error).to.be.equal('Usuário e senha são obrigatórios.');
         });
 
         it('Deve retornar 400 quando a senha não for informada', async () => {
-            const response = await login('leonardo.padilha');
+            const { username } = usuarios.senha_vazia;
+            const response = await login(username);
 
                 expect(response.status).to.be.equal(400);
                 expect(response.body.error).to.be.equal('Usuário e senha são obrigatórios.');
@@ -62,14 +71,16 @@ describe('Login', () => {
         });
 
         it('Deve retornar um token JWT válido com 3 segmentos separados por ponto', async () => {
-            const response = await login('leonardo.padilha', '123456');
+            const { username, senha } = usuarios.usuario_valido;
+            const response = await login(username, senha);
 
             const segments = response.body.token.split('.');
             expect(segments).to.have.length(3);
         });
 
         it('Deve retornar um token com os campos id e username no payload', async () => {
-            const response = await login('leonardo.padilha', '123456');
+            const { username, senha } = usuarios.usuario_valido;
+            const response = await login(username, senha);
 
             const payload = jwt.decode(response.body.token);
             expect(payload).to.have.property('id');
@@ -77,7 +88,8 @@ describe('Login', () => {
         });
 
         it('Deve retornar um token com expiração de 1 hora', async () => {
-            const response = await login('leonardo.padilha', '123456');
+            const { username, senha } = usuarios.usuario_valido;
+            const response = await login(username, senha);
 
             const payload = jwt.decode(response.body.token);
             expect(payload.exp - payload.iat).to.be.equal(3600);
